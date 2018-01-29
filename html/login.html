@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>向日葵</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <style type="text/css">
+        html,
+        body {
+            height: 100%;
+            background: #c73535;
+        }
+        /*#wrap {
+            height: 100%;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-flex-flow: column;
+            flex-flow: column;
+        }*/
+
+        #header {
+            position: relative;
+            text-align: center;
+            margin-top: 16px;
+            font-size: 16px;
+            color: #fefbfb;
+            height: 44px;
+            line-height: 44px;
+            font-size: "PingFang SC";
+        }
+
+        #footer h5 {
+            /*position: fixed;*/
+            width: 100%;
+            left: 0;
+            bottom: 0;
+            height: 44px;
+            line-height: 44px;
+            text-align: center;
+            font-size: 12px;
+            color: #fefbfb;
+            font-size: "PingFang SC";
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header">
+        欢迎您登录“向日葵”特困儿童信息跟踪系统
+    </div>
+    <div id="footer">
+        <h5>Copyright &copy;河北省赵县人民检察院</h5>
+        <h5>技术支持：河北工程技术学院软件学院</h5>
+    </div>
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+      api.parseTapmode();
+        var header = $api.byId('header');
+        var footer = $api.byId('footer');
+        var height = api.winHeight;
+        var width = api.winWidth;
+        $api.fixStatusBar(header);
+        var headerH = $api.offset(header).h;
+        var footerH = $api.offset(footer).h;
+        api.openFrame({
+            name: 'loginframe',
+            url: '../html/loginframe.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: width,
+                h: height - headerH - footerH
+            },
+            pageParam: {
+                name: 'test'
+            },
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0)',
+            vScrollBarEnabled: true,
+            hScrollBarEnabled: true
+        });
+        ExitApp();
+    };
+//双击退出应用
+    function ExitApp() {
+        var ci = 0;
+        var time1, time2;
+        api.addEventListener({
+            name: 'keyback'
+        }, function(ret, err) {
+            if (ci == 0) {
+                time1 = new Date().getTime();
+                ci = 1; 
+                api.toast({
+                    msg: '再按一次返回键退出'
+                });
+
+            } else if (ci == 1) {
+                time2 = new Date().getTime();
+                if (time2 - time1 < 3000) {
+                    api.closeWidget({
+                        id: api.appId,
+                        retData: {
+                            name: 'closeWidget'
+                        },
+                        silent: true
+                    });
+                } else {
+                    ci = 0; 
+                    api.toast({
+                        msg: '再按一次返回键退出'
+                    });
+                }
+            }
+        });
+    }
+
+</script>
+
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui_2.css" />
+    <style>
+        [class$="aui-list-view-cell"] {
+            padding-left: 3.5rem;
+        }
+
+        .aui-searchbar-wrap {
+            background: #fff;
+        }
+
+        .aui-searchbar {
+            background: #eeeff3;
+        }
+
+        .portrait {
+            background: url("../image/icon.png") center no-repeat;
+            background-size: 2rem;
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            position: absolute;
+            ;
+            left: 1rem;
+            top: .45rem;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .portrait img {
+            border: none;
+            outline: none;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .totup {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #aui-searchbar-input {
+            background: #eeeff3;
+        }
+
+        .nmore {
+            width: 100%;
+            text-align: center;
+            color: #858585;
+            font-size: 12px;
+            margin-top: 0.75em;
+        }
+
+        .name {
+            width: auto;
+            height: 2rem;
+            line-height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <div class="aui-searchbar" id="search">
+        <div class="aui-searchbar-input aui-border-radius">
+            <i class="aui-iconfont aui-icon-search"></i>
+            <input type="search" placeholder="请输入搜索内容" id="search-input">
+            <div class="aui-searchbar-clear-btn">
+                <i class="aui-iconfont aui-icon-close"></i>
+            </div>
+        </div>
+        <div class="aui-searchbar-btn" tapmode>取消</div>
+    </div> -->
+    <ul class="aui-list aui-media-list" id="div">
+        <li class="aui-list-item aui-list-item-middle" tapmode onclick="fnOpenIndividual(this);">
+            <div class="id2" style="display:none">
+            </div>
+            <div class="aui-media-list-item-inner">
+                <div class="aui-list-item-media" style="width: 3rem;">
+                    <img src="" class="aui-img-round aui-list-img-sm pic">
+                </div>
+                <div class="aui-list-item-inner name">
+                </div>
+            </div>
+        </li>
+
+    </ul>
+    <div class="nmore" id="nmore">
+        没有更多了
+    </div>
+</body>
+
+<script type="text/javascript" src="../script/aui-tap.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        var http = $api.getStorage("http");
+        api.parseTapmode();
+        var MessengerPhone = $api.getStorage("MessengerPhone");
+        api.ajax({
+            url: http + 'SunFlower/api/list.php',
+            method: 'get',
+            data: {
+                values: {
+                    MessengerPhone: MessengerPhone
+                }
+            }
+        }, function(ret, err) {
+
+            var theTemplate = document.getElementById("div").innerHTML;
+            var div = document.getElementById("div");
+            // alert(theTemplate);
+            for (var i = 0; i < ret.data.length - 1; i++) {
+
+                div.innerHTML += theTemplate;
+            }
+            var name = document.getElementsByClassName("name");
+            var pic = document.getElementsByClassName("pic");
+            var id = document.getElementsByClassName('id2');
+            for (var i = 0; i < ret.data.length; i++) {
+                pic[i].src = http + "SunFlower/" + ret.data[i].MinorPhoto;
+                name[i].innerHTML = ret.data[i].MnName;
+                id[i].innerHTML = ret.data[i].Id;
+            }
+            var data_list = document.getElementById('nmore');
+            data_list.innerHTML = "共" + ret.data.length + "名儿童";
+        });
+    };
+
+    function fnOpenIndividual(index_) {
+        var id = index_;
+        var src = id.getElementsByClassName('id2');
+        var minorId = src[0].innerHTML;
+        $api.setStorage("Id", minorId);
+
+  var http = $api.getStorage("http");
+        api.ajax({
+            url: http+'SunFlower/api/show.php',
+            method: 'get',
+            data: {
+                values: {
+                    Id: minorId
+                }
+            }
+        }, function(ret, err) {
+          // if (ret) {
+          //     api.alert({msg: JSON.stringify(ret)});
+          //       } else {
+          //
+          //       api.alert({
+          //           msg: JSON.stringify(err)
+          //       });
+          //   }
+          // alert(ret.data[0].MnName);
+$api.setStorage("MinorCardId",ret.data[0].MinorCardId);});
+        api.openWin({
+            name: 'individual',
+            url: '../html/individual.html',
+            pageParam: {
+                name: 'test'
+            }
+        });
+
+    }
+</script>
+
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>title</title>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui_2.css" />
+    <link rel="stylesheet" type="text/css" href="../css/aui-win.css" />
+    <link rel="stylesheet" type="text/css" href="../css/aui-slide.css" />
+    <style>
+        [class$="warning"] {
+            background: #c73535;
+        }
+
+        .aui-pull-left {
+            z-index: 3;
+        }
+.aui-tab-item a{
+  color: #858585;
+  position: relative;
+  z-index: 5;
+  top: -2px;
+  display: inline-block;
+  width: 95px;
+}
+        .aui-slide-page-line {
+            width: 5px;
+            height: 5px;
+            border-radius: 5px;
+        }
+        .aui-tab-item.aui-active{
+          border-bottom: none;
+        }
+        .aui-tab-item.aui-active>a{
+          color: #c73535;
+          border-bottom:2px solid #c73535;
+
+        }
+        .aui-tab{
+
+          border-bottom: 1px solid #d7d7d7;
+        }
+        .aui-slide-page-active{
+          background: #c73535;
+        }
+        .aui-slide-page-dot{
+          bottom: -10px;
+        }
+        .photo{
+          position: relative;
+          width: 100%;
+          background: #fff;
+          height: auto;
+          position: relative;
+          padding: 16px 0 0;
+        }
+        .photo img{
+margin: 0 16px;
+width: 30%;
+height: 130px;
+position: relative;
+        }
+        .aui-list-item-inner span{
+          position: absolute;
+          left: 50px;
+          color: #666666;
+        }
+        .minortext{
+          width: 65%;
+          position: absolute;
+          left: 32%;
+          top: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="aui-bar aui-bar-nav aui-bar-warning" id="aui-header" style="padding-top:25px;">
+        <a class="aui-btn  aui-pull-left aui-btn-warning" tapmode onclick="fnCloseWin();">
+            <span><i class="aui-iconfont aui-icon-left"></i></span>
+        </a>
+        <div class="aui-title">
+            个人信息
+        </div>
+        <a class="aui-btn  aui-pull-right aui-btn-warning" tapmode onclick="fnOpenAddinterviewWin();">
+            <span>新建</span>
+        </a>
+    </header>
+    <section id="section">
+        <div class="photo">
+                    <img src="../image/slid1.jpg" id="photo" />
+                    <div class="minortext">
+                      <ul class="aui-list aui-list-in">
+                      <li class="aui-list-item aui-list-item-middle">
+                          <div class="aui-list-item-inner">
+                              姓名<span id="name">安小吉</span>
+                          </div>
+                      </li>
+                      <li class="aui-list-item aui-list-item-middle">
+                        <div class="aui-list-item-inner">
+                            性别<span id='sex'>男</span>
+                        </div>
+                      </li>
+                      <li class="aui-list-item aui-list-item-middle">
+                        <div class="aui-list-item-inner">
+                            生日<span id="birthday">2010-08-20</span>
+                        </div>
+                      </li>
+                      <ul>
+                    </div>
+                    <ul class="aui-list">
+                    <li class="aui-list-item aui-list-item-middle">
+                      <div class="aui-list-item-inner">
+                          籍贯<span id="address" class="aui-ellipsis-1">河北省石家庄市赵县三里屯12号</span>
+                      </div>
+                    </li>
+                    <ul>
+            </div>
+        <nav class="aui-tab" id="tab">
+            <div class="aui-tab-item aui-active" tapmode onclick="fnSetTabSelectedindex(0);"><a>基本信息</a></div>
+            <div class="aui-tab-item" tapmode onclick="fnSetTabSelectedindex(1);">
+                <a>访谈记录</a></div>
+        </nav>
+    </section>
+</body>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+      var Id = $api.getStorage("Id");
+  var http = $api.getStorage("http");
+
+      api.ajax({
+          url: http+'SunFlower/api/show.php',
+          method: 'get',
+          data: {
+              values: {
+                Id:Id
+
+              }
+          }
+      }, function(ret, err) {
+        // if (ret) {
+        //     api.alert({msg: JSON.stringify(ret)});
+        //       } else {
+        //
+        //       api.alert({
+        //           msg: JSON.stringify(err)
+        //       });
+        //   }
+        // alert(ret.data[0].MnName);
+        var name = document.getElementById("name");
+        var sex = document.getElementById("sex");
+        var birthday = document.getElementById("birthday");
+          var photo = document.getElementById("photo");
+          var address = document.getElementById("address");
+          name.innerHTML = ret.data[0].MnName;
+          sex.innerHTML = ret.data[0].sex;
+          birthday.innerHTML = ret.data[0].birthday;
+          photo.src=http+"SunFlower/"+ret.data[0].MinorPhoto;
+          address.innerHTML = ret.data[0].address;
+      });
+        api.parseTapmode();
+        var header = $api.byId('aui-header');
+        var section = $api.byId('section');
+        $api.fixStatusBar(header);
+        meaus = $api.domAll(section, 'div.aui-tab-item');
+
+        var headerPos = $api.offset(header);
+        var sectionPos = $api.offset(section);
+        var frames = [];
+        for (var i = 0; i < meaus.length; i++) {
+            frames.push({
+                name: 'indivdualframegroup' + i,
+                url: '../html/indivdualframegroup' + i + '.html'
+            })
+        }
+        api.openFrameGroup({
+            name: 'indivdualframegroup',
+            scrollEnabled: true,
+            rect: {
+                x: 0,
+                y: headerPos.h + sectionPos.h,
+                w: api.winWidth,
+                h: 'auto'
+            },
+            index: 0,
+            frames: frames
+        }, function(ret, err) {
+
+            fnSetTabSelected(ret.index);
+        });
+    };
+    var meaus;
+
+    function fnSetTabSelected(index_) {
+        for (var i = 0; i < meaus.length; i++) {
+            if (index_ == i) {
+                $api.addCls(meaus[i], 'aui-active');
+            } else {
+                $api.removeCls(meaus[i], 'aui-active');
+            }
+        }
+    }
+
+    function fnSetTabSelectedindex(index_) {
+        api.setFrameGroupIndex({
+            name: 'indivdualframegroup',
+            index: index_,
+            scroll: true
+        });
+    }
+
+    function fnOpenAddinterviewWin() {
+        api.openWin({
+            name: 'addinterview',
+            url: '../html/addinterview.html',
+            pageParam: {
+                name: 'test'
+            }
+        });
+
+    };
+
+    function fnCloseWin() {
+$api.rmStorage('Id');
+$api.rmStorage('MinorCardId');
+
+
+        api.closeWin();
+    }
+</script>
+</script>
+</html>

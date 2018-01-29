@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui_2.css" />
+    <link rel="stylesheet" type="text/css" href="../css/aui-win.css" />
+    <style>
+        [class$="warning"] {
+            background: #c73535;
+        }
+
+        .aui-pull-left {
+            z-index: 3;
+        }
+
+        #footer {
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .aui-tab {
+            border-top: 1px solid rgba(215, 215, 215, 0.9);
+            box-shadow: 0 -4px 5px -3px #ccc;
+        }
+
+        .aui-tab-item {
+            line-height: 1em;
+            padding-top: 0.3em;
+        }
+
+        .user {
+            background: url("../image/user.png") center no-repeat;
+            background-size: 44px;
+        }
+
+        .user.aui-active {
+            background: url("../image/userfc.png") center no-repeat;
+            background-size: 44px;
+        }
+
+        .trends {
+            background: url("../image/trends.png") center no-repeat;
+            background-size: 44px;
+        }
+
+        .trends.aui-active {
+            background: url("../image/trendsfc.png") center no-repeat;
+            background-size: 44px;
+        }
+
+        .aui-tab-item.aui-active {
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="aui-bar aui-bar-nav aui-bar-warning" id="aui-header" style="padding-top:25px;">
+        <a class="aui-btn  aui-pull-left aui-btn-warning" tapmode onclick="fnCloseWin();">
+            <span><i class="aui-iconfont aui-icon-left"></i></span>
+        </a>
+        <div class="aui-title" id="title">
+            分配人员
+        </div>
+
+    </header>
+    <footer id="footer">
+        <div class="aui-tab">
+            <div class="aui-tab-item tapmode trends aui-active " tapmode onclick="fnSetTabSelectedindex(0);">
+            </div>
+            <div class="aui-tab-item tapmode user" tapmode onclick="fnSetTabSelectedindex(1);">
+            </div>
+        </div>
+    </footer>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        var header = $api.byId('aui-header');
+        var footer = $api.byId('footer');
+        $api.fixStatusBar(header);
+        var headerPos = $api.offset(header);
+        var footerPos = $api.offset(footer);
+        meaus = $api.domAll(footer, '.aui-tab-item');
+        var frames = [];
+        for (var i = 0; i < meaus.length; i++) {
+            frames.push({
+                name: 'listframe' + i,
+                url: '../html/listframe' + i + '.html'
+            })
+        }
+        api.openFrameGroup({
+            name: 'listframe',
+            scrollEnabled: true,
+            rect: {
+                x: 0,
+                y: headerPos.h,
+                w: api.winWidth,
+                h: api.winHeight - headerPos.h - footerPos.h
+
+            },
+            index: 0,
+            frames: frames
+        }, function(ret, err) {
+            fnSetTabSelected(ret.index);
+        });
+    }
+    var meaus;
+
+    function fnSetTabSelected(index_) {
+        for (var i = 0; i < meaus.length; i++) {
+            if (index_ == i) {
+                $api.addCls(meaus[i], 'aui-active');
+            } else {
+                $api.removeCls(meaus[i], 'aui-active');
+            }
+        }
+    }
+
+    function fnSetTabSelectedindex(index_) {
+        api.setFrameGroupIndex({
+            name: 'listframe',
+            index: index_,
+            scroll: true
+        });
+    }
+
+    function fnOpenAddinterviewWin() {
+        api.openWin({
+            name: 'addinterview',
+            url: '../html/addinterview.html',
+            pageParam: {
+                name: 'test'
+            }
+        });
+
+    };
+
+    function fnCloseWin() {
+        api.actionSheet({
+            title: '退出登录',
+            cancelTitle: '取消',
+            buttons: ['是', '否']
+        }, function(ret, err) {
+            if (ret.buttonIndex == 1) {
+                $api.rmStorage('MessengerPhone');
+                $api.rmStorage('Id');
+                $api.rmStorage('MinorCardId');
+                $api.rmStorage('uploadfile');
+                $api.rmStorage('MnName');
+                api.closeWin();
+            } else {
+                //  alert( JSON.stringify( err ) );
+            }
+        });
+    }
+
+    function ExitApp() {
+        var ci = 0;
+        var time1, time2;
+        api.addEventListener({
+            name: 'keyback'
+        }, function(ret, err) {
+            if (ci == 0) {
+                time1 = new Date().getTime();
+                ci = 1; 
+                api.toast({
+                    msg: '再按一次返回键退出登陆'
+                });
+
+            } else if (ci == 1) {
+                time2 = new Date().getTime();
+                if (time2 - time1 < 3000) {
+                    api.closeWin();
+
+                } else {
+                    ci = 0; 
+                    api.toast({
+                        msg: '再按一次返回键退出登陆'
+                    });
+                }
+            }
+        });
+    }
+</script>
+
+</html>

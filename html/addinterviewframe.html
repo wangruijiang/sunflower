@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>title</title>
+
+    <link rel="stylesheet" type="text/css" href="../css/aui_2.css" />
+    <style>
+        .aui-list-item-input textarea {
+            border: none;
+            height: 7em;
+            padding: 1em;
+        }
+
+        .aui-wrap {
+            background: #ffffff;
+        }
+
+        .aui-img {
+            text-align: center;
+        }
+
+        .aui-list-header {
+            background: none;
+        }
+
+        .aui-radio {
+            width: 0.8rem;
+            height: 0.8rem;
+            top: 4px;
+        }
+
+        .aui-radio:checked {
+            background-color: #c73535;
+            border: solid 1px #c73535;
+        }
+
+        .aui-radio:checked:before {
+            background: none;
+            border: none;
+        }
+
+        .aui-radio:checked:after,
+        .aui-radio:checked:before {
+            content: "";
+        }
+
+        .aui-col-xs-3 {
+            background: #f8f8f8;
+            margin-left: 20px;
+            height: 77px;
+            padding-top: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            position: relative;
+            ;
+            bottom: 100%;
+            margin-bottom: -3rem;
+            left: 0;
+            width: 100%;
+        }
+
+        .footer button {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+            color: #ffffff;
+        }
+
+        #url2 img {
+            float: left;
+            border: none;
+            outline-style: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="aui-wrap">
+        <div class="aui-list-item-input">
+            <textarea placeholder="请输入访谈内容" id="ChatCoutent"></textarea>
+        </div>
+        <div class="aui-content">
+            <ul class="aui-list-view aui-grid-view" id="url2">
+                <img src="../image/error-img.png" alt="" id="minorphoto" class="aui-list-view-cell aui-col-xs-4" style="height:3.8rem; border:none;outline:none; margin-left:1rem;">
+                <li class="aui-list-view-cell aui-img aui-col-xs-3" tapmode onclick="fnSetAvatar();">
+                    <i class="aui-iconfont aui-icon-camera"></i>
+                    <h6>照片/视频</h6>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="aui-content aui-margin-b-15 aui-row ">
+        <ul class="aui-list aui-list-in aui-grid">
+          <li class="aui-list-header">
+
+          </li>
+
+            <li class="aui-list-header">
+
+            </li>
+            <li class="aui-list-item aui-list-item-middle">
+                <div class="aui-list-item-inner">
+                    <span class="aui-list-item-text" style="width:4rem;">当前需求:</span>
+                    <input type="text" name="" placeholder="请输入当前需求" class="aui-list-item-input" id="Currentneeds">
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="footer">
+        <button type="button" name="button" class="aui-btn aui-btn-danger aui-btn-block aui-border" onclick="fnUploadAll();">提交</button>
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+    };
+      var http = $api.getStorage("http");
+    function fnUploadAll() {
+        var MinorCardId = $api.getStorage("MinorCardId");
+        var MessengerPhone = $api.getStorage("MessengerPhone");
+        var Currentneeds = document.getElementById('Currentneeds').value;
+        var ChatCoutent = document.getElementById('ChatCoutent').value;
+        var uploadfile = $api.getStorage("uploadfile");
+        api.ajax({
+            url: http+'SunFlower/api/upload.php',
+            method: 'post',
+            data: {
+                values: {
+                    MinorCardId: MinorCardId,
+                    MessengerPhone: MessengerPhone,
+                    ChatCoutent: ChatCoutent,
+                    uploadfile: uploadfile,
+                    Currentneeds:Currentneeds
+
+                }
+            }
+        }, function(ret, err) {
+             if (ret) {
+               alert("写入成功")
+              $api.rmStorage('uploadfile');
+              api.closeToWin({
+                  name: 'list'
+              });
+            } else {
+              alert("写入失败")
+            }
+        });
+
+    }
+
+    function fnSetAvatar() {
+        api.actionSheet({
+            title: '选择',
+            cancelTitle: '取消',
+            buttons: ['拍照', '相册']
+        }, function(ret, err) {
+            if (ret) {
+                var sourceTypes = [
+                    'camera',
+                    'album'
+                ];
+                api.getPicture({
+                    sourceType: sourceTypes[ret.buttonIndex - 1],
+                    allowEdit: true,
+                    quality: 50,
+                    targetWidth: 750,
+                    targetHeight: 750,
+                    saveToPhotoAlbum: false
+
+                }, function(ret, err) {
+                    if (ret) {
+                        // alert(JSON.stringify(ret.data));
+                        fnUploadAtavar(ret.data);
+
+                    } else {
+                        alert(JSON.stringify(err));
+                    }
+                });
+
+            } else {
+                alert(JSON.stringify(err));
+            }
+        });
+    }
+
+//alert(http);
+    function fnUploadAtavar(avatarUrl_) { //上传文件
+        api.ajax({
+            url: http+'SunFlower/api/showimage.php',
+            method: 'post',
+            data: {
+                values: {},
+                files: {
+                    upfile: avatarUrl_
+                }
+            },
+            dataType: 'json',
+        }, function(ret, err) {
+            if (ret) {
+                // alert(JSON.stringify(ret.data));
+                //返回上传到服务器上的路径
+                fnUpdateUserAtavar(ret.data);
+            } else {
+                alert(JSON.stringify(err));
+            }
+        });
+    }
+
+    function fnUpdateUserAtavar(avatar_) { //更改页面照片
+        var url = avatar_.substr(3);
+
+        $api.setStorage("uploadfile", url);
+        document.getElementById('minorphoto').src = http+"SunFlower/" + url;
+    }
+</script>
+
+</html>

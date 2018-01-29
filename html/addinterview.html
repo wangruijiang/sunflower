@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui-win.css" />
+    <style>
+        [class$="warning"] {
+            background: #c73535;
+        }
+        .aui-pull-left {
+            z-index: 3;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="aui-bar aui-bar-nav aui-bar-warning" id="aui-header" style="padding-top:25px;">
+        <a class="aui-btn aui-pull-left aui-btn-warning" tapmode onclick="fnCloseWin();">
+            <span class="aui-iconfont aui-icon-left"></span>
+        </a>
+        <div class="aui-title">
+            新建访谈
+        </div>
+        
+    </header>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        var header = $api.byId('aui-header');
+        $api.fixStatusBar(header);
+        var headerPos = $api.offset(header);
+        api.openFrame({
+            name: 'addinterviewframe',
+            url: '../html/addinterviewframe.html',
+            rect: {
+                x: 0,
+                y: headerPos.h,
+                w: headerPos.w,
+                h: 'auto'
+            },
+            pageParam: {
+                name: 'test'
+            },
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0)',
+            vScrollBarEnabled: true,
+            hScrollBarEnabled: true
+        });
+
+    };
+
+    function fnCloseWin() {
+        api.closeWin();
+
+    }
+</script>
+
+</html>
